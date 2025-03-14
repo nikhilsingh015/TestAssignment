@@ -1,0 +1,28 @@
+openapi: 3.1.0
+info:
+  title: RestApi
+  description: API acting as a proxy to DbWorker
+  version: 1.0.0
+paths:
+  /api/DbWorkerProxy:
+    get:
+      summary: Retrieve addresses from DbWorker
+      responses:
+        '200':
+          description: List of addresses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Address'
+components:
+  schemas:
+    Address:
+      type: object
+      properties:
+        # Existing properties...
+        email:
+          type: string
+        phoneNumber:
+          type: string

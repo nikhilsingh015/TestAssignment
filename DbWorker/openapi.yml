@@ -1,0 +1,117 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: "1.0"
+paths:
+  /api/address:
+    get:
+      tags:
+        - Address
+      responses:
+        "200":
+          description: OK
+    post:
+      tags:
+        - Address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestAddress"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/RequestAddress"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/RequestAddress"
+      responses:
+        "200":
+          description: OK
+  /api/address/{id}:
+    get:
+      tags:
+        - Address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+    put:
+      tags:
+        - Address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestAddress"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/RequestAddress"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/RequestAddress"
+      responses:
+        "200":
+          description: OK
+    delete:
+      tags:
+        - Address
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        "200":
+          description: OK
+components:
+  schemas:
+    RequestAddress:
+      required:
+        - city
+        - country
+        - name
+        - email # Mark email as required
+      type: object
+      properties:
+        name:
+          type: string
+          nullable: true
+        street:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        country:
+          type: string
+          nullable: true
+        state:
+          type: string
+          nullable: true
+        zipcode:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+          description: Mandatory email address.
+        phoneNumber:
+          type: string
+          nullable: true
+          description: Optional phone number.
+      additionalProperties: false

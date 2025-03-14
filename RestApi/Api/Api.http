@@ -1,0 +1,44 @@
+# api.http (example)
+
+@baseUrl = http://localhost:5000
+
+# Get all addresses
+GET {{baseUrl}}/api/dbworker/addresses
+
+### 
+
+# Get address by ID
+GET {{baseUrl}}/api/dbworker/addresses/1
+
+###
+
+# Create a new address
+POST {{baseUrl}}/api/dbworker/addresses
+Content-Type: application/json
+
+{
+  "name": "New User",
+  "street": "123 Main St",
+  "city": "Anytown",
+  "country": "USA", 
+  "email": "newuser@example.com" 
+}
+
+###
+
+# Update an existing address
+PUT {{baseUrl}}/api/dbworker/addresses/1
+Content-Type: application/json
+
+{
+  "name": "Updated User",
+  "street": "456 Oak Ave",
+  "city": "Springfield",
+  "country": "USA",
+  "email": "updateduser@example.com"
+}
+
+### 
+
+# Delete an address
+DELETE {{baseUrl}}/api/dbworker/addresses/2

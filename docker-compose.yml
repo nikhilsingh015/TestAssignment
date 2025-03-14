@@ -1,0 +1,36 @@
+services:
+  database-layer:
+    build:
+      context: ./DbWorker
+      dockerfile: Dockerfile
+    volumes:
+      - ./database.sqlite:/app/database.sqlite
+    networks:
+      - app-network
+    restart: always
+
+    environment:
+      DOTNET_CLI_HOME: /tmp/dotnet-cli-home  # Redirect NuGet operations to a writable directory
+
+  api-layer:
+    build:
+      context: ./RestApi
+      dockerfile: Dockerfile
+    ports:
+      - "8787:8080"  # HTTP
+    environment:
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTPS_PORT=0  # Disable HTTPS
+      - DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT=true
+    depends_on:
+      - database-layer
+    networks:
+      - app-network
+    restart: always
+
+
+
+networks:
+  app-network:
+    driver: bridge
