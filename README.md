@@ -87,30 +87,193 @@ The entire solution was containerized using Docker, adhering to best practices f
 
 ---
 
-## **4. Deployment Instructions**
+# Detailed Instructions to Run the Kerry Test Project
 
-### Prerequisites
-- Install Docker and Docker Compose on your system.
+This document provides step-by-step instructions to build, deploy, and run the Kerry Test Project using Docker Compose. Follow these instructions to ensure the project runs successfully.
 
-### Steps to Build and Run
-1. Clone this repository:
+---
+
+## **Prerequisites**
+
+Before running the project, ensure you have the following installed on your system:
+
+1. **Docker**:
+   - Install Docker from [Docker's official website](https://www.docker.com/get-started).
+   - Verify installation by running:
+     ```bash
+     docker --version
+     ```
+
+2. **Docker Compose**:
+   - Docker Compose is usually bundled with Docker Desktop.
+   - Verify installation by running:
+     ```bash
+     docker-compose --version
+     ```
+
+3. **SQLite Database File**:
+   - Ensure you have the `database.sqlite` file provided in the assignment or created during development.
+   - Place this file in the root directory of the project repository.
+
+---
+
+## **Steps to Run the Project**
+
+### **Step 1: Clone the Repository**
+Clone the project repository from GitHub to your local machine:
+```bash
+git clone 
+cd TestAssignment
+```
+
+---
+
+### **Step 2: Place SQLite Database File**
+Place your SQLite database file (`database.sqlite`) in the root directory of the cloned repository. This file will be mounted into the `database-layer` container during runtime.
+
+---
+
+### **Step 3: Build and Start Containers**
+Use Docker Compose to build and start the containers:
+
+1. Run the following command to build and start all services:
    ```bash
-   git clone 
-   cd KerryTestAssignment
+   docker compose up --build -d
    ```
 
-2. Place your SQLite database file (`database.sqlite`) in the root directory of this repository.
-
-3. Build and start containers using Docker Compose:
+2. Verify that both containers (`api-layer` and `database-layer`) are running:
    ```bash
-   docker compose up --build
+   docker ps
    ```
 
-4. Access the APIs:
-   - RestApi: `http://localhost:8787`
-     Example endpoint: `http://localhost:8787/api/addresses`
-   
-5. Verify functionality using tools like Postman or curl.
+You should see output similar to this:
+```
+CONTAINER ID   IMAGE                                COMMAND            CREATED          STATUS          PORTS                    NAMES
+c34a53d587d8   TestAssignment-api-layer        "dotnet Api.dll"   X seconds ago    Up X seconds    0.0.0.0:8787->8080/tcp   TestAssignment-api-layer-1
+f21ff428273f   TestAssignment-database-layer   "dotnet DbWorker"  X seconds ago    Up X seconds                            TestAssignment-database-layer-1
+```
+
+---
+
+### **Step 4: Access REST APIs**
+
+#### **RestApi (Proxy API)**
+The `api-layer` container exposes RestApi on port `8787`. You can access its endpoints via `http://localhost:8787`.
+
+#### Example Endpoints:
+1. **Get All Addresses**:
+   ```bash
+   curl http://localhost:8787/api/addresses
+   ```
+
+2. **Get Address by ID**:
+   ```bash
+   curl http://localhost:8787/api/addresses/1
+   ```
+
+3. **Create a New Address**:
+   ```bash
+   curl -X POST http://localhost:8787/api/addresses \
+        -H "Content-Type: application/json" \
+        -d '{
+              "name": "John Doe",
+              "email": "john.doe@example.com",
+              "phoneNumber": "1234567890",
+              "city": "New York",
+              "country": "USA"
+            }'
+   ```
+
+4. **Update an Address**:
+   ```bash
+   curl -X PUT http://localhost:8787/api/addresses/1 \
+        -H "Content-Type: application/json" \
+        -d '{
+              "name": "Jane Doe",
+              "email": "jane.doe@example.com",
+              "phoneNumber": "0987654321",
+              "city": "Los Angeles",
+              "country": "USA"
+            }'
+   ```
+
+5. **Delete an Address**:
+   ```bash
+   curl -X DELETE http://localhost:8787/api/addresses/1
+   ```
+
+#### **DbWorker**
+The `database-layer` container is accessible only within the Docker network and cannot be accessed externally for security purposes.
+
+---
+
+### **Step 5: Verify Logs**
+
+If any issues arise, check logs for both containers:
+
+#### Check Logs for `api-layer` (RestApi):
+```bash
+docker logs TestAssignment-api-layer-1
+```
+
+#### Check Logs for `database-layer` (DbWorker):
+```bash
+docker logs TestAssignment-database-layer-1
+```
+
+---
+
+### **Step 6: Stop Containers**
+To stop and remove containers, run:
+```bash
+docker compose down
+```
+
+---
+
+### **Step 7: Rebuild Containers**
+If you make changes to the code or configuration, rebuild containers using:
+```bash
+docker compose up --build -d
+```
+
+---
+
+## **Additional Notes**
+
+### Networking Configuration:
+- The `api-layer` container is accessible externally on port `8787`.
+- The `database-layer` container is isolated within the Docker network (`app-network`) and cannot be accessed externally.
+
+### Mounted Volumes:
+- The SQLite database file (`database.sqlite`) is mounted into `/app/database.sqlite` in the `database-layer` container.
+
+---
+
+## Troubleshooting
+
+### Issue 1: Containers Not Starting Properly
+Run this command to check for errors during startup:
+```bash
+docker-compose logs --tail=50
+```
+
+### Issue 2: Cannot Access API Endpoints Externally
+Ensure port mapping (`8787:8080`) is correct by running:
+```bash
+docker ps
+```
+You should see something like this for `api-layer`:
+```
+0.0.0.0:8787->8080/tcp
+```
+
+### Issue 3: Permission Errors During Build or Runtime
+Ensure proper directory permissions are set for mounted volumes (e.g., SQLite database file). Run this command to fix permissions locally:
+```bash
+chmod 777 database.sqlite
+```
+
 
 ## Issue
 - Getting an error when trying to test it through docker, due to lack of time I could not invest more time to the assignment. 
